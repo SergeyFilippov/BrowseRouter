@@ -1,0 +1,8 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=406fa6a1_002Dbc61_002D40c4_002Db748_002D891405219dee/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetDomainAndPatternRegular" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::90964780-A852-4B1E-9D61-93CA1FB6E27E::net6.0-windows::BrowserRouter.Tests.UrlPreferenceExtensionsTests.GetDomainAndPatternRegular&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::90964780-A852-4B1E-9D61-93CA1FB6E27E::net6.0-windows::BrowserRouter.Tests.UrlPreferenceExtensionsTests.GetDomainAndPatternRegex&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::90964780-A852-4B1E-9D61-93CA1FB6E27E::net6.0-windows::BrowserRouter.Tests.UrlPreferenceExtensionsTests.GetDomainAndPatternQuery&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
