@@ -13,12 +13,18 @@ jobs:
       uses: actions/setup-dotnet@v2
       with:
         dotnet-version: 6.0.x
+    - name: DotNet Bump Versions
+      uses: SiqiLu/dotnet-bump-version@2.0.0
+      with:
+        version_files: "**/*.csproj"
+        version_mask: 0.0.0.${{ github.run_number }}
+        version_overwrite: "*.*.*.*"
     - name: publish
       run: dotnet publish App/BrowseRouter.csproj /p:PublishProfile=App/Properties/PublishProfiles/FolderProfile.pubxml
     - name: Archive production artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: published-binary
+        name: published-binary-${{ github.run_number }}
         path: |
           App/publish
           !App/publish/**/*.pdb
