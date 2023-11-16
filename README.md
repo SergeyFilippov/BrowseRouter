@@ -2,6 +2,12 @@
 
 In Windows, launch a different browser depending on the url.
 
+## Support
+
+If you like BrowseRouter, let me know in [a discussion](https://github.com/slater1/BrowseRouter/discussions/new?category=general). I work a full time job. BrowseRouter is just a hobby. You can help support continued development by "buying me a coffee."
+
+<a href="https://www.buymeacoffee.com/slater1" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
 ## Why?
 
 `BrowseRouter` becomes your default "browser". When you click a link, it decides which real browser to launch. If you have multiple browsers installed, this is very useful. Example use cases:
@@ -64,13 +70,24 @@ chrome = C:\Program Files (x86)\Google\Chrome\Application\chrome.exe
 edge = C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe
 
 ; Url preferences.
-; Only * is treated as a special character (wildcard).
-; Matches are domain-only. Protocols and paths are ignored.
-; Use "*.blah.com" for subdomains, not "*blah.com" as that would also match "abcblah.com".
+; - Only * is treated as a special character (wildcard).
+; - Only domains are matched. Don't include protocols e.g. "https://" or paths e.g. "/some/path?query=value"
+; - Beware that subdomains don't match automatically, e.g. "youtube.com = chrome" would not launch Chrome for "www.youtube.com"
+;   For that reason, you'll often want a leading "*." e.g. "*.youtube.com". 
+;   Note: Don't use "*youtube.com" as that would also match e.g. "notyoutube.com".
 [urls]
-google.com = chrome
-visualstudio.com = edge
-mozilla.org = ff
+*.google.com = chrome
+*.youtube.com = chrome
+*.visualstudio.com = edge
+*.mozilla.org = ff
+
+; Source preferences.
+; Only * is treated as a special character (wildcard).
+; Matches on window title of application used to open link.
+; Applied only if no url preference match is found.
+[sources]
+* - Notepad = ff
+Slack | Test = chrome
 ; Default case. Added automatically
 ; * = whatever
 ```
@@ -80,6 +97,20 @@ mozilla.org = ff
 - Browsers must either be in your path or be fully-qualified paths to the executable e.g. `C:\Program Files (x86)\Google\Chrome\Application\chrome.exe`.
 - Arguments are optional. However, if you provide arguments the path _must_ be enclosed in quotes. For example, `"chrome.exe" --new-window`
 - If there are no arguments, then the paths do not need to be quoted. For example, `chrome.exe` will work.
+
+## Sources
+
+- You can optionally specify a "source preference" which matches the window title of the application used to open the link.
+  - For example, with this in the previous example `config.ini`:
+
+    ```ini
+    [sources]
+    *Microsoft Teams* = ff
+    ```
+
+    Then clicking a link in Microsoft Teams will open the link in Firefox, regardless of the URL.
+
+- In the case of a conflict between a source preference and a URL preference, the source preference wins.
 
 ### Urls
 
@@ -102,3 +133,7 @@ There are two ways to specify an Url. You can use simple wildcards or full regul
 - Full regular expressions are specified by wrapping it in /'s.
 - The domain _and_ path are used in the Url comparison.
 - The regular expression syntax is based on the Microsoft .NET implementation.
+
+### Sources
+
+Wildcares and full regular expressions may also be used to match source window titles.

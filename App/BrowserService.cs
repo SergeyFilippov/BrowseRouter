@@ -11,23 +11,39 @@ public class BrowserService
     _config = config;
   }
 
-  public void Launch(string url)
+  public void Launch(string url, string windowTitle)
   {
     try
     {
-      IEnumerable<UrlPreference> prefs = _config.GetUrlPreferences();
+      Log.Write($"Attempting to launch \"{url}\" for \"{windowTitle}\"");
+
+      IEnumerable<UrlPreference> urlPreferences = _config.GetUrlPreferences("urls");
+      IEnumerable<UrlPreference> sourcePreferences = _config.GetUrlPreferences("sources");
       Uri uri = UriFactory.Get(url);
 
-      if (!prefs.TryGetPreference(uri, out UrlPreference pref))
+      UrlPreference? pref = null;
+      if (sourcePreferences.TryGetPreference(windowTitle, out UrlPreference sourcePref))
       {
-        Log.Write($"Unable to find a browser matching {url}.");
+        Log.Write($"Found source preference {sourcePref}");
+        pref = sourcePref;
+      }
+      
+      else if (urlPreferences.TryGetPreference(uri, out UrlPreference urlPref))
+      {
+        Log.Write($"Found URL preference {urlPref}");
+        pref = urlPref;
+      }
+
+      if (pref == null)
+      {
+        Log.Write($"Unable to find a browser matching \"{url}\".");
         return;
       }
 
       (string path, string args) = Executable.GetPathAndArgs(pref.Browser.Location);
 
-      // We need to use an absolute URI value, to prevent uri.ToString() - in this case some symbols in HTML encoding are replaced (for example %20)
-      Process.Start(path, $"{args} {uri.AbsoluteUri}");
+      Log.Write($"Launching {path} with args \"{args} {uri.OriginalString}\"");
+      Process.Start(path, $"{args} {uri.OriginalString}");
     }
     catch (Exception e)
     {
