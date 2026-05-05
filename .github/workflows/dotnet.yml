@@ -14,11 +14,10 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: DotNet Bump Versions
-      uses: SiqiLu/dotnet-bump-version@2.0.0
+      uses: vers-one/dotnet-project-version-updater@v1.3
       with:
-        version_files: "**/*.csproj"
-        version_mask: 0.0.0.${{ github.run_number }}
-        version_overwrite: "*.*.*.*"
+        file: '**/*.csproj'
+        version: 'bump-build'
     - name: publish
       run: dotnet publish App/BrowseRouter.csproj /p:PublishProfile=App/Properties/PublishProfiles/FolderProfile.pubxml
     - name: Archive production artifacts
