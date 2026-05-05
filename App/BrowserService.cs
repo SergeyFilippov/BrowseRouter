@@ -11,24 +11,19 @@ public class BrowserService
     _config = config;
   }
 
-  public void Launch(string url, string windowTitle)
+  public void Launch(string url)
   {
     try
     {
-      Log.Write($"Attempting to launch \"{url}\" for \"{windowTitle}\"");
+      Log.Write($"Attempting to launch \"{url}\"");
 
       IEnumerable<UrlPreference> urlPreferences = _config.GetUrlPreferences("urls");
       IEnumerable<UrlPreference> sourcePreferences = _config.GetUrlPreferences("sources");
       Uri uri = UriFactory.Get(url);
 
       UrlPreference? pref = null;
-      if (sourcePreferences.TryGetPreference(windowTitle, out UrlPreference sourcePref))
-      {
-        Log.Write($"Found source preference {sourcePref}");
-        pref = sourcePref;
-      }
       
-      else if (urlPreferences.TryGetPreference(uri, out UrlPreference urlPref))
+      if (urlPreferences.TryGetPreference(uri, out UrlPreference urlPref))
       {
         Log.Write($"Found URL preference {urlPref}");
         pref = urlPref;
