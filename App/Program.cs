@@ -31,7 +31,9 @@ public class Program
 
     if (!isOption)
     {
-      new BrowserService(new ConfigService()).Launch(a);
+      var config = new ConfigService();
+      var history = new HistoryService(config);
+      new BrowserService(config, history).Launch(a);
       return;
     }
 

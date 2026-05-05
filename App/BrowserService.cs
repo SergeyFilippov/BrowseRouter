@@ -4,11 +4,13 @@ namespace BrowseRouter;
 
 public class BrowserService
 {
-  private readonly IConfigService _config;
+  private readonly IConfigService config;
+  private readonly HistoryService history;
 
-  public BrowserService(IConfigService config)
+  public BrowserService(IConfigService config, HistoryService history)
   {
-    _config = config;
+    this.config = config;
+    this.history = history;
   }
 
   public void Launch(string url)
@@ -16,9 +18,10 @@ public class BrowserService
     try
     {
       Log.Write($"Attempting to launch \"{url}\"");
+      history.RecordUrl(url);
 
-      IEnumerable<UrlPreference> urlPreferences = _config.GetUrlPreferences("urls");
-      IEnumerable<UrlPreference> sourcePreferences = _config.GetUrlPreferences("sources");
+      IEnumerable<UrlPreference> urlPreferences = config.GetUrlPreferences("urls");
+      IEnumerable<UrlPreference> sourcePreferences = config.GetUrlPreferences("sources");
       Uri uri = UriFactory.Get(url);
 
       UrlPreference? pref = null;
