@@ -4,7 +4,7 @@ namespace BrowseRouter;
 
 public static class App
 {
-  private static string exePath;
+  private static string? exePath;
 
   public static string ExePath
   {

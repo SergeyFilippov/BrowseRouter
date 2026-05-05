@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using System.Runtime.Versioning;
+using Microsoft.Win32;
 
 namespace BrowseRouter;
 
@@ -14,10 +15,24 @@ public class RegistryService
   private string UrlKey => $"SOFTWARE\\Classes\\{AppID}URL";
   private string CapabilityKey => $"SOFTWARE\\{AppID}\\Capabilities";
 
-  private RegistryKey? _registerKey => Registry.LocalMachine.OpenSubKey("SOFTWARE\\RegisteredApplications", true);
+  private RegistryKey? _registerKey;
 
+  public RegistryService()
+  {
+    if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+    {
+      this._registerKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\\RegisteredApplications", true);
+    }
+  }
+
+  [SupportedOSPlatform("windows")]
   public void Register()
   {
+    if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+    {
+      throw new PlatformNotSupportedException();
+    }
+    
     // Register application.
     RegistryKey? appReg = Registry.LocalMachine.CreateSubKey(AppKey);
 
@@ -58,8 +73,14 @@ public class RegistryService
     handlerReg.CreateSubKey("shell\\open\\command").SetValue("", AppOpenUrlCommand);
   }
 
+  [SupportedOSPlatform("windows")]
   public void Unregister()
   {
+    if (Environment.OSVersion.Platform != PlatformID.Win32NT)
+    {
+      throw new PlatformNotSupportedException();
+    }
+    
     Registry.LocalMachine.DeleteSubKeyTree(AppKey, false);
 
     if (_registerKey != null)

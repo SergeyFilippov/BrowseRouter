@@ -1,4 +1,5 @@
 ﻿namespace BrowseRouter;
+
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -6,6 +7,9 @@ public class Program
 {
   private static void Main(string[] args)
   {
+    var config = new ConfigService();
+    Log.InjectConfig(config);
+
     if (args.Length == 0)
     {
       ShowHelp();
@@ -15,11 +19,11 @@ public class Program
     // Process each URL in the arguments list.
     foreach (string arg in args)
     {
-      Run(arg);
+      Run(arg, config);
     }
   }
 
-  private static void Run(string arg)
+  private static void Run(string arg, ConfigService config)
   {
     string a = arg.Trim();
 
@@ -31,23 +35,25 @@ public class Program
 
     if (!isOption)
     {
-      var config = new ConfigService();
       var history = new HistoryService(config);
       new BrowserService(config, history).Launch(a);
       return;
     }
 
-    new ElevationService().RequireAdmin();
-
-    if (string.Equals(a, "register", StringComparison.OrdinalIgnoreCase))
+    if (Environment.OSVersion.Platform == PlatformID.Win32NT)
     {
-      new RegistryService().Register();
-      return;
-    }
+      new ElevationService().RequireAdmin();
 
-    if (string.Equals(a, "unregister", StringComparison.OrdinalIgnoreCase))
-    {
-      new RegistryService().Unregister();
+      if (string.Equals(a, "register", StringComparison.OrdinalIgnoreCase))
+      {
+        new RegistryService().Register();
+        return;
+      }
+
+      if (string.Equals(a, "unregister", StringComparison.OrdinalIgnoreCase))
+      {
+        new RegistryService().Unregister();
+      }
     }
   }
 
@@ -55,7 +61,7 @@ public class Program
   {
     Log.Write
     (
-$@"{nameof(BrowseRouter)}: In Windows, launch a different browser depending on the url.
+      $@"{nameof(BrowseRouter)}: In Windows, launch a different browser depending on the url.
 
    Usage:
 
