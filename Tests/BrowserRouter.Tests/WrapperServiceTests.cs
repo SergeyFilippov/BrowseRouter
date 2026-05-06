@@ -5,17 +5,17 @@ namespace BrowserRouter.Tests
   /// </summary>
   internal class FakeConfigService : IConfigService
   {
-    private readonly IEnumerable<WrapperPreference> _wrappers;
+    private readonly IReadOnlyList<WrapperPreference> _wrappers;
 
     public FakeConfigService(IEnumerable<WrapperPreference> wrappers)
     {
-      _wrappers = wrappers;
+      _wrappers = wrappers.ToList();
     }
 
-    public IEnumerable<UrlPreference> GetUrlPreferences(string configType) =>
-      Enumerable.Empty<UrlPreference>();
+    public IReadOnlyList<UrlPreference> GetUrlPreferences(string configType) =>
+      Array.Empty<UrlPreference>();
 
-    public IEnumerable<WrapperPreference> GetWrapperPreferences() => _wrappers;
+    public IReadOnlyList<WrapperPreference> GetWrapperPreferences() => _wrappers;
 
     public string? GetSetting(string key) => null;
   }

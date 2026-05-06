@@ -1,33 +1,27 @@
-﻿using System.Reflection;
-
-namespace BrowseRouter;
+﻿namespace BrowseRouter;
 
 public static class App
 {
-  private static string? exePath;
+  private static string? _exePath;
 
   public static string ExePath
   {
     get
     {
-      if (!string.IsNullOrEmpty(exePath))
-      {
-        return exePath;
-      }
+      if (_exePath != null)
+        return _exePath;
 
-      var assembly = Assembly.GetExecutingAssembly();
-      // .NET Core returns BrowserSettings.dll but we need BrowserSettings.exe
-      exePath = Assembly.GetExecutingAssembly().Location
-          .Replace(".dll", ".exe");
+      // Environment.ProcessPath is available from .NET 6+ and is a direct native call —
+      // no reflection, no string manipulation needed.
+      _exePath = Environment.ProcessPath;
 
-      if (!string.IsNullOrEmpty(exePath))
-      {
-        return exePath;
-      }
+      if (!string.IsNullOrEmpty(_exePath))
+        return _exePath;
 
+      // Fallback for edge cases (e.g. single-file publish on older hosts).
       var dir = AppDomain.CurrentDomain.BaseDirectory;
-      exePath = Path.Combine(dir, AppDomain.CurrentDomain.FriendlyName + ".exe");
-      return exePath;
+      _exePath = Path.Combine(dir, AppDomain.CurrentDomain.FriendlyName + ".exe");
+      return _exePath;
     }
   }
 }

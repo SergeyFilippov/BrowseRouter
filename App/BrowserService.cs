@@ -27,8 +27,7 @@ public class BrowserService
       if (!string.Equals(unwrapped, url, StringComparison.Ordinal))
         Log.Write($"Unwrapped URL: \"{unwrapped}\"");
 
-      IEnumerable<UrlPreference> urlPreferences = config.GetUrlPreferences("urls");
-      IEnumerable<UrlPreference> sourcePreferences = config.GetUrlPreferences("sources");
+      IReadOnlyList<UrlPreference> urlPreferences = config.GetUrlPreferences("urls");
       Uri uri = UriFactory.Get(unwrapped);
 
       UrlPreference? pref = null;
