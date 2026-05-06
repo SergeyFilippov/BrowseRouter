@@ -3,6 +3,7 @@
 public interface IConfigService
 {
   IEnumerable<UrlPreference> GetUrlPreferences(string configType);
+  IEnumerable<WrapperPreference> GetWrapperPreferences();
   string? GetSetting(string key);
 }
 
@@ -68,6 +69,21 @@ public class ConfigService : IConfigService
       urls = urls.Union(new[] { new UrlPreference { UrlPattern = "*", Browser = browsers.FirstOrDefault().Value } }); // Add a catch-all that uses the first browser
 
     return urls;
+  }
+
+  public IEnumerable<WrapperPreference> GetWrapperPreferences()
+  {
+    if (!File.Exists(ConfigPath))
+      return Enumerable.Empty<WrapperPreference>();
+
+    var configLines =
+      File.ReadAllLines(ConfigPath)
+      .Select(l => l.Trim())
+      .Where(l => !string.IsNullOrWhiteSpace(l) && !l.StartsWith(";") && !l.StartsWith("#"));
+
+    return GetConfig(configLines, "wrappers")
+      .Select(SplitConfig)
+      .Select(kvp => new WrapperPreference { UrlPattern = kvp.Key, ParamName = kvp.Value });
   }
 
   private IEnumerable<string> GetConfig(IEnumerable<string> configLines, string configName)

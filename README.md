@@ -137,3 +137,25 @@ There are two ways to specify an Url. You can use simple wildcards or full regul
 ### Sources
 
 Wildcares and full regular expressions may also be used to match source window titles.
+
+### Wrappers
+
+Many enterprise tools (Microsoft Teams, Outlook) wrap every outbound link in a "safe link" redirect URL. Without wrapper support, you'd need a separate `[urls]` rule for every wrapper variant pointing to the same browser.
+
+The `[wrappers]` section lets you declare each wrapper once. BrowseRouter will extract the real destination URL from the wrapper's query parameter and re-run the normal `[urls]` matching on it — so a single `gitlab* = brave` rule works regardless of which wrapper the link arrived through.
+
+**Format:**
+
+```ini
+[wrappers]
+; ?<wrapper-url-pattern>? = <query-param-name-holding-the-real-url>
+?*teams.cdn.office.net/evergreen-assets/safelinks*? = url
+?*outlook.office.com/mail/safelink*?                = url
+?*safelinks.protection.outlook.com*?                = url
+```
+
+- The pattern uses the same `?…?` wildcard syntax as `[urls]`: `*` matches anything, and the match is made against the full URL (host + path + query string).
+- The right-hand side is the name of the query parameter whose value is the real destination URL.
+- Rules are evaluated top-to-bottom; first match wins.
+- Unwrapping is recursive (up to 10 levels), so chained wrappers (e.g. Outlook wrapping a Teams safe link) are handled automatically.
+- If `[wrappers]` is absent, BrowseRouter behaves exactly as before — no breaking change.

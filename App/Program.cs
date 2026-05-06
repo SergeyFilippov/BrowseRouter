@@ -36,7 +36,8 @@ public class Program
     if (!isOption)
     {
       var history = new HistoryService(config);
-      new BrowserService(config, history).Launch(a);
+      var wrapper = new WrapperService(config);
+      new BrowserService(config, history, wrapper).Launch(a);
       return;
     }
 

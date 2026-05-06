@@ -6,11 +6,13 @@ public class BrowserService
 {
   private readonly IConfigService config;
   private readonly HistoryService history;
+  private readonly WrapperService wrapper;
 
-  public BrowserService(IConfigService config, HistoryService history)
+  public BrowserService(IConfigService config, HistoryService history, WrapperService wrapper)
   {
     this.config = config;
     this.history = history;
+    this.wrapper = wrapper;
   }
 
   public void Launch(string url)
@@ -20,9 +22,14 @@ public class BrowserService
       Log.Write($"Attempting to launch \"{url}\"");
       history.RecordUrl(url);
 
+      // Unwrap safe-link / redirect wrappers before any rule matching.
+      string unwrapped = wrapper.Unwrap(url);
+      if (!string.Equals(unwrapped, url, StringComparison.Ordinal))
+        Log.Write($"Unwrapped URL: \"{unwrapped}\"");
+
       IEnumerable<UrlPreference> urlPreferences = config.GetUrlPreferences("urls");
       IEnumerable<UrlPreference> sourcePreferences = config.GetUrlPreferences("sources");
-      Uri uri = UriFactory.Get(url);
+      Uri uri = UriFactory.Get(unwrapped);
 
       UrlPreference? pref = null;
       
@@ -34,7 +41,7 @@ public class BrowserService
 
       if (pref == null)
       {
-        Log.Write($"Unable to find a browser matching \"{url}\".");
+        Log.Write($"Unable to find a browser matching \"{unwrapped}\".");
         return;
       }
 
@@ -49,3 +56,4 @@ public class BrowserService
     }
   }
 }
+
