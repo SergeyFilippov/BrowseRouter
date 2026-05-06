@@ -40,12 +40,16 @@ public static class Log
     {
       return;
     }
-    
+
+    string path = Path.IsPathRooted(logFile_)
+      ? logFile_
+      : Path.Combine(Path.GetDirectoryName(App.ExePath)!, logFile_);
+
     foreach (int i in Enumerable.Range(0, 10))
     {
       try
       {
-        using var writer = new StreamWriter(logFile_, append: true);
+        using var writer = new StreamWriter(path, append: true);
         writer.WriteLine(message);
         return;
       }
