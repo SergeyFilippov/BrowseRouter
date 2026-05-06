@@ -25,8 +25,9 @@ ConfigService  (reads config.ini)
       ├──► HistoryService.RecordUrl()   (optional rolling log, last 10 URLs)
       │
       └──► BrowserService.Launch(url)
-                │
-                ├── UriFactory.Get(url)              normalize / prepend https://
+                 │
+                 ├── WrapperService.Unwrap(url)          unwrap safe-links (recursive, ≤10)
+                 ├── UriFactory.Get(url)              normalize / prepend https://
                 ├── ConfigService.GetUrlPreferences() load [urls] rules
                 ├── UrlPreferenceExtensions.TryGetPreference()  ← pattern engine
                 │         matches URI against ordered rule list; first match wins
@@ -43,6 +44,7 @@ ConfigService  (reads config.ini)
 | `Program.cs` | Entry point; parses CLI args, wires services, dispatches to register or launch |
 | `ConfigService.cs` | Hand-rolled INI parser; exposes browsers, URL preferences, and raw settings |
 | `BrowserService.cs` | Orchestrates URL → browser resolution and process launch |
+| `WrapperService.cs` | Unwraps safe-link / redirect wrapper URLs before rule matching (recursive, max 10 levels) |
 | `UrlPreferenceExtensions.cs` | Pattern-matching engine; converts INI patterns to .NET regexes |
 | `UriFactory.cs` | Normalizes URLs; wraps bare hostnames in `https://` |
 | `Executable.cs` | Splits a browser config value into an exe path + optional CLI args |
@@ -71,6 +73,14 @@ ff     = C:\Program Files\Mozilla Firefox\firefox.exe
 /(?:[0-9]{1,3}\.){3}[0-9]{1,3}/ = ff   ; regex: IP addresses
 ?*teams.cdn.office.net*?url*slack.com*? = chrome  ; query-string match
 ; implicit catch-all appended automatically: * = <first browser>
+
+; Link-wrapper / safe-link unwrapping.
+; Pattern matches the wrapper URL; value is the query param holding the real URL.
+; Unwrapping runs before [urls] matching, recursively up to 10 levels.
+[wrappers]
+?*teams.cdn.office.net/evergreen-assets/safelinks*? = url
+?*outlook.office.com/mail/safelink*?                = url
+?*safelinks.protection.outlook.com*?                = url
 
 [settings]
 log          = true          ; write BrowseRouter.log next to the exe
