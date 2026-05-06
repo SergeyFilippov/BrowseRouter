@@ -3,6 +3,7 @@
 public interface IConfigService
 {
   IEnumerable<UrlPreference> GetUrlPreferences(string configType);
+  string? GetSetting(string key);
 }
 
 public class ConfigService : IConfigService
@@ -16,6 +17,22 @@ public class ConfigService : IConfigService
   {
     // Fix for self-contained publishing
     this.ConfigPath = Path.Combine(Path.GetDirectoryName(App.ExePath)!, "config.ini");
+  }
+
+  public string? GetSetting(string key)
+  {
+    if (!File.Exists(ConfigPath))
+      return null;
+
+    var configLines =
+      File.ReadAllLines(ConfigPath)
+      .Select(l => l.Trim())
+      .Where(l => !string.IsNullOrWhiteSpace(l) && !l.StartsWith(";") && !l.StartsWith("#"));
+
+    return GetConfig(configLines, "settings")
+      .Select(SplitConfig)
+      .FirstOrDefault(kvp => string.Equals(kvp.Key, key, StringComparison.OrdinalIgnoreCase))
+      .Value;
   }
 
   public IEnumerable<UrlPreference> GetUrlPreferences(string configType)
